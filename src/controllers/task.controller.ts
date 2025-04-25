@@ -1,21 +1,33 @@
-import { Response } from "express";
-import { AuthRequest } from "../middlewares/auth.middleware";
+import { Request, Response } from "express";
 import { TaskService } from "../services/task.service";
-import { asyncHandler } from "../utils/asyncHandler";
 
-export const listTasks = asyncHandler(async (req: AuthRequest, res: Response) => {
-  res.json(await TaskService.list(req.userId!));
-});
+export const TaskController = {
+  list: async (req: Request, res: Response) => {
+    const filter = {
+      projectId: req.query.projectId as string | undefined,
+      statusId: req.query.statusId as string | undefined,
+      categoryIds: req.query.categoryId
+        ? Array.isArray(req.query.categoryId)
+          ? (req.query.categoryId as string[])
+          : [req.query.categoryId as string]
+        : undefined,
+    };
+    const tasks = await TaskService.list(req.userId!, filter);
+    res.json(tasks);
+  },
 
-export const createTask = asyncHandler(async (req: AuthRequest, res: Response) => {
-  res.status(201).json(await TaskService.create(req.userId!, req.body));
-});
+  create: async (req: Request, res: Response) => {
+    const task = await TaskService.create(req.userId!, req.body);
+    res.status(201).json(task);
+  },
 
-export const updateTask = asyncHandler(async (req: AuthRequest, res: Response) => {
-  res.json(await TaskService.update(req.params.id, req.userId!, req.body));
-});
+  update: async (req: Request, res: Response) => {
+    const task = await TaskService.update(req.userId!, req.params.id, req.body);
+    res.json(task);
+  },
 
-export const deleteTask = asyncHandler(async (req: AuthRequest, res: Response) => {
-  await TaskService.remove(req.params.id, req.userId!);
-  res.status(204).end();
-});
+  remove: async (req: Request, res: Response) => {
+    await TaskService.remove(req.userId!, req.params.id);
+    res.status(204).end();
+  },
+};

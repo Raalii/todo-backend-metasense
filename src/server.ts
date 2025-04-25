@@ -2,7 +2,9 @@ import cors from "cors";
 import express from "express";
 import { errorHandler, notFound } from "./middlewares/error.middleware";
 import { authRouter } from "./routes/auth.routes";
-import { columnRouter } from "./routes/column.routes";
+import { categoryRouter } from "./routes/categories.routes";
+import { projectRouter } from "./routes/projects.routes";
+import { statusRouter } from "./routes/statuses.routes";
 import { taskRouter } from "./routes/task.routes";
 
 // Configuration CORS avec l'URL spécifique
@@ -16,14 +18,21 @@ const corsOptions = {
 const app = express();
 app.use(cors(corsOptions));
 app.use(express.json());
-app.get("/api/hello", (_req, res) => {
-  res.json({ message: "Hello from backend 🎉" });
-});
 app.use("/api/auth", authRouter);
-app.use("/api/columns", columnRouter);
+app.use("/api/statuses", statusRouter);
+app.use("/api/categories", categoryRouter);
+app.use("/api/projects", projectRouter);
 app.use("/api/tasks", taskRouter);
 app.use(notFound);
 app.use(errorHandler);
-app.listen(process.env.PORT || 4000, () =>
-  console.log("Backend ready on port 4000")
-);
+app.get("/api/hello", (_req, res) => {
+  res.json({ message: "Hello from backend 🎉" });
+});
+
+if (require.main === module) {
+  // exécuté directement
+  const port = process.env.PORT || 4000;
+  app.listen(port, () => console.log(`Backend ready on port ${port}`));
+}
+
+export default app;
