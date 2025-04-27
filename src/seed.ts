@@ -50,7 +50,7 @@ export async function seedUserDefaults(userId: string) {
     ],
   });
 
-  /* Lie la première tâche à la catégorie “Général” */
+  /* Lie la première tâche à la catégorie “Général ” */
   await prisma.taskCategory.create({
     data: {
       taskId: (await prisma.task.findFirst({
